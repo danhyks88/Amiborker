@@ -1,0 +1,16 @@
+function IndexBarOfEndDay(endDay) {
+    endIndex = 0;
+    dt       = DateTime();
+
+    for (i = BarCount - 1; i >= 0; i--) {
+
+        currentTime = DateTimeFormat("%Y-%m-%d", dt[i]);
+
+        if (currentTime == endDay) {
+            endIndex = i;
+
+            break;
+        }
+    }
+    return endIndex;
+}

@@ -1,0 +1,16 @@
+#include "D:/Github/Amiborker/General.afl"
+#include "D:/Github/Amiborker/FileFunction/File.afl"
+#include "D:/Github/Amiborker/General/BarFunction.afl";
+#Include "D:/Github/Amiborker/ExportJson/ExportOHLC.afl"
+
+_SECTION_BEGIN("ExportToJson");
+exportPath = "D:/Github/ChungKhoan/Data/Export/";
+
+targetDate = ExtractFirstDayFromJson(exportPath);
+endIndex   = IndexBarOfEndDay(targetDate);
+ExportData(exportPath, endIndex);
+
+Print(Name());
+
+_SECTION_END();
+

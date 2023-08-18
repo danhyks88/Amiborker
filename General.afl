@@ -1,0 +1,14 @@
+function Print(value) {
+    convertString = "";
+    if (typeof (value) == "number") {
+        convertString = NumToStr(value);
+    }
+    else {
+        convertString = value;
+    }
+
+    printf(convertString);
+}
+
+
+

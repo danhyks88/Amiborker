@@ -1,0 +1,72 @@
+
+function MakeJsonValue(jsonString, valueName, value, isHaveComma) {
+
+    if (typeof (value) == "number") {
+        if (IsEmpty(value)) {
+            jsonString = jsonString + "\"" + valueName + "\": \"\"";
+        }
+        else {
+            jsonString = jsonString + "\"" + valueName + "\": " + NumToStr(value, 1.2);
+        }
+
+    }
+
+    else {
+
+        jsonString = jsonString + "\"" + valueName + "\": \"" + value + "\"";
+
+    }
+
+    if (isHaveComma == true) {
+        jsonString = jsonString + ",\n";
+
+    }
+    else {
+        jsonString = jsonString + "\n";
+    }
+    return jsonString;
+}
+
+function ExportData(folderExport, endIndex) {
+
+    jsonString = "{\n";
+    dt         = DateTime();
+
+    RSI14 = RSIa(Close, 14);
+    Print(endIndex);
+
+    Print(BarCount - 1);
+    isValidStock = StrLen(Name()) == 3;
+
+    if (endIndex != BarCount - 1 && isValidStock) {
+        fileExport = folderExport + Name() + ".json";
+        fh         = fopen(fileExport, "w");
+        jsonString = "{\n";
+        for (i = BarCount - 1; i >= endIndex; i--) {
+            currentTime = DateTimeFormat("%Y-%m-%d", dt[i]);
+
+            jsonString = jsonString + "\"" + currentTime + "\": {\n";
+            jsonString = MakeJsonValue(jsonString, "open", Open[i], true);
+            jsonString = MakeJsonValue(jsonString, "close", Close[i], true);
+            jsonString = MakeJsonValue(jsonString, "open", Open[i], true);
+            jsonString = MakeJsonValue(jsonString, "high", High[i], true);
+            jsonString = MakeJsonValue(jsonString, "low", Low[i], true);
+            jsonString = MakeJsonValue(jsonString, "rsi14", RSI14[i], true);
+
+            jsonString = MakeJsonValue(jsonString, "last", "", false);
+
+            if (i == endIndex) {
+                jsonString = jsonString + "}\n";
+            }
+            else {
+                jsonString = jsonString + "},\n";
+            }
+
+        }
+        jsonString = jsonString + "\n}";
+        fputs(jsonString, fh);
+        fclose(fh);
+    }
+
+}
+

@@ -1,0 +1,23 @@
+
+function ExtractFirstDayFromJson(folderImport) {
+
+    fileExport = folderImport + Name() + ".json";
+    targetDate = "";
+
+    fh = fopen(fileExport, "r");
+    if (fh) {
+        lineTime = "";
+        while (!feof(fh)) {
+            lineTime = fgets(fh);
+            if (strlen(lineTime) > 2) {
+
+                break;
+            }
+
+        }
+        fclose(fh);
+        targetDate = strmid(lineTime, 1, 10);
+    }
+
+    return targetDate;
+}
