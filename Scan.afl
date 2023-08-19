@@ -1,0 +1,20 @@
+
+#include "D:/Github/Amiborker/ExportData.afl";
+
+
+sellArray = Null;
+buyArray = Null;
+percentArray = Null;
+sellDateArray = Null;
+result = BuySell("buyArray","sellArray","percentArray","sellDateArray");
+
+Buy =buyArray;
+Sell = sellArray;
+Filter = buyArray || sellArray;
+AddColumn(Close,"Close");
+AddColumn(Volume,"Volume");
+AddColumn(RSIa(Close,28),  "RSI");
+
+percentColor = IIf(percentArray < -6,colorRed,IIf(percentArray>0,colorBlue,colorWhite));
+AddColumn(percentArray,"Percent",1.2,colorWhite,percentColor);
+AddColumn(sellDateArray,  "KeepDate");

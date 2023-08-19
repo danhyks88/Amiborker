@@ -27,23 +27,110 @@ function MakeJsonValue(jsonString, valueName, value, isHaveComma) {
     return jsonString;
 }
 
+function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray) {
+    buyArray      = null;
+    sellArray     = null;
+    percentArray  = null;
+    sellDateArray = null;
+    rsiInterval   = 28;
+    rsiBuy        = 25;
+    rsiSell       = 75;
+    buyPrice      = 0;
+    sellPrice     = 0;
+    dt            = DateTime();
+    dateBuy       = null;
+    RSI14         = RSIa(Close, rsiInterval);
+
+    isValidStock = StrLen(Name()) == 3;
+
+    if (isValidStock) {
+
+        dist     = 1.5 * ATR(10);
+        isBuy    = false;
+        isSell   = true;
+        buyPrice = 0;
+        for (i = 0; i <= BarCount - 1; i++) {
+            currentDay  = dt[i];
+            tradeVolume = Volume[i] * Close[i] >= 3000000;
+            if (tradeVolume == false) {
+                // continue;
+            }
+
+            currentTime = DateTimeFormat("%Y-%m-%d", currentDay);
+            rsi14Value  = RSI14[i];
+
+            if (IsEmpty(rsi14Value)) {
+                continue;
+            }
+
+            buySignal = rsi14Value <= rsiBuy && isSell == true;
+
+            if (buySignal) {
+                                  dateBuy  = currentDay;
+                         buyArray[i]       = true;
+                                  isBuy    = true;
+                                  isSell   = false;
+                                  buyPrice = Close[i];
+                PlotText("Buyn@" + C[i] + "\n" + currentTime, i, L[i] - dist[i], colorGreen);
+
+                buyPrice = Close[i];
+            }
+            else {
+                buyArray[i] = false;
+            }
+
+            sellPrice = Close[i];
+            percent   = ((sellPrice - buyPrice) / buyPrice) * 100;
+
+            sellSignal = rsi14Value >= rsiSell && isBuy == true && sellPrice >= buyPrice;
+            if (sellSignal) {
+
+                sellArray[i]     = true;
+                          isBuy  = false;
+                          isSell = true;
+
+                percentArray  [i]      = percent;
+                              dateKeep = (currentDay - dateBuy) / (24 * 60 * 60);
+                sellDateArray[i]       = dateKeep;
+                PlotText("Selln@" + C[i] + "\n" + currentTime, i, H[i] + dist[i], colorRed, colorYellow);
+            }
+            else {
+                sellArray     [i] = false;
+                percentArray  [i] = 0;
+                sellDateArray[i]  = 0;
+            }
+
+        }
+
+    }
+    VarSet(outArrayBuy, buyArray);
+    VarSet(outArraySell, sellArray);
+
+    VarSet(outArrayPercentage, percentArray);
+    VarSet(outSellDateArray, sellDateArray);
+    return;
+
+}
+
+isExport = false;
+
 function ExportData(folderExport, endIndex) {
+
+    Print("Start Export");
 
     jsonString = "{\n";
     dt         = DateTime();
 
     RSI14 = RSIa(Close, 14);
-    Print(endIndex);
 
-    Print(BarCount - 1);
     isValidStock = StrLen(Name()) == 3;
 
-    if (endIndex != BarCount - 1 && isValidStock) {
-        fileExport = folderExport + Name() + ".json";
-        fh         = fopen(fileExport, "w");
+    if (endIndex != BarCount - 1 && isValidStock && isExport == false) {
+
         jsonString = "{\n";
         for (i = BarCount - 1; i >= endIndex; i--) {
-            currentTime = DateTimeFormat("%Y-%m-%d", dt[i]);
+
+            currentTime = DateTimeFormat("%Y-%m-%d", currentDay);
 
             jsonString = jsonString + "\"" + currentTime + "\": {\n";
             jsonString = MakeJsonValue(jsonString, "open", Open[i], true);
@@ -63,7 +150,10 @@ function ExportData(folderExport, endIndex) {
             }
 
         }
+        isExport   = true;
         jsonString = jsonString + "\n}";
+        fileExport = folderExport + Name() + ".json";
+        fh         = fopen(fileExport, "w");
         fputs(jsonString, fh);
         fclose(fh);
     }

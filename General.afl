@@ -6,9 +6,7 @@ function Print(value) {
     else {
         convertString = value;
     }
-
+    convertString = convertString + "\n";
     printf(convertString);
 }
-
-
 

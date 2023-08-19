@@ -5,19 +5,20 @@ function ExtractFirstDayFromJson(folderImport) {
     targetDate = "";
 
     fh = fopen(fileExport, "r");
+
     if (fh) {
         lineTime = "";
         while (!feof(fh)) {
             lineTime = fgets(fh);
             if (strlen(lineTime) > 2) {
 
+                targetDate = strmid(lineTime, 1, 10);
                 break;
             }
 
         }
-        fclose(fh);
-        targetDate = strmid(lineTime, 1, 10);
-    }
 
+    }
+    fclose(fh);
     return targetDate;
 }
