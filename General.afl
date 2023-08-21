@@ -3,9 +3,15 @@ function Print(value) {
     if (typeof (value) == "number") {
         convertString = NumToStr(value);
     }
+
+    else if (typeof (value) == "array") {
+
+    }
+
     else {
         convertString = value;
     }
+
     convertString = convertString + "\n";
     printf(convertString);
 }
