@@ -8,12 +8,12 @@ function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray
     sellArray       = null;
     percentArray    = null;
     sellDateArray   = null;
-    rsiInterval     = 28;
-    rsiBuy          = 20;
+    rsiInterval     = 14;
+    rsiBuy          = 25;
     rsiSell         = 80;
     buyPrice        = 0;
     sellPrice       = 0;
-    percentSell     = -80;
+    percentSell     = -6;
     dt              = DateTime();
     dateBuy         = 0;
     RSI14           = RSIa(Close, rsiInterval);
@@ -66,18 +66,18 @@ function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray
                 current_percent[i] = 0;
             }
 
-            sellAtPercentDown = percent <= percentSell;
-            if (sellAtPercentDown && isBuy == true) {
+            // sellAtPercentDown = percent <= percentSell;
+            // if (sellAtPercentDown && isBuy == true) {
 
-                              isBuy = false;
-                sellDateArray[i]    = dayNum[i] - dateBuy;
-                sellArray    [i]    = true;
-                percentArray [i]    = percent;
-                continue;
+            //                   isBuy = false;
+            //     sellDateArray[i]    = dayNum[i] - dateBuy;
+            //     sellArray    [i]    = true;
+            //     percentArray [i]    = percent;
+            //     continue;
 
-            }
+            // }
 
-            sellSignalRSI   = rsi14Value >= rsiSell && isBuy == true && sellPrice >= buyPrice;
+            sellSignalRSI   = rsi14Value >= rsiSell && isBuy == true;
             sellAtPercentUp = isBuy == true && percent >= 200;
             if (sellSignalRSI) {
 
@@ -86,7 +86,6 @@ function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray
                               isBuy  = false;
                               isSell = true;
                 sellDateArray[i]     = dayNum[i] - dateBuy;
-                break;
             }
             else {
                 sellArray[i] = false;

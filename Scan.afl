@@ -2,14 +2,14 @@
 #include "D:/Github/Amiborker/ExportData.afl";
 
 
-sellArray = Null;
-buyArray = Null;
-percentArray = Null;
+sellArray     = Null;
+buyArray      = Null;
+percentArray  = Null;
 sellDateArray = Null;
-result = BuySell("buyArray","sellArray","percentArray","sellDateArray");
+result        = BuySell("buyArray","sellArray","percentArray","sellDateArray");
 
-Buy =buyArray;
-Sell = sellArray;
+Buy    = buyArray;
+Sell   = sellArray;
 Filter = buyArray || sellArray;
 AddColumn(Close,"Close");
 AddColumn(Volume,"Volume");
