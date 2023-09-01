@@ -7,7 +7,7 @@ percentArray        = Null;
 sellDateArray       = Null;
 RSI_Array           = Null;
 current_percent_buy = Null;
-result              = BuySell("buyArray", "sellArray", "percentArray", "sellDateArray", "RSI_Array", "current_percent_buy");
+result              = BuyRSIPhanKiDuong("buyArray", "sellArray", "percentArray", "sellDateArray", "RSI_Array", "current_percent_buy");
 
 Buy    = buyArray;
 Sell   = sellArray;

@@ -1,24 +1,24 @@
 #include "D:/Github/Amiborker/General.afl"
+buyArray         = null;
+current_percent  = null;
+sellArray        = null;
+percentArray     = null;
+sellDateArray    = null;
+rsiInterval      = 28;
+rsi_buy_signal   = 26;
+rsiSell          = 80;
+buyPrice         = 0;
+sellPrice        = 0;
+percentSell      = -6;
+dt               = DateTime();
+dateBuy          = 0;
+rsi_close        = RSIa(Close, rsiInterval);
+x                = Now(5);
+dayNum           = DaysSince1900();
+rsi_lowest       = 100;
+rsi_price_lowest = 0;
 
 function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray, outRSIArray, out_current_percent) {
-
-    buyArray        = null;
-    current_percent = null;
-    rsi_Array       = null;
-    sellArray       = null;
-    percentArray    = null;
-    sellDateArray   = null;
-    rsiInterval     = 14;
-    rsiBuy          = 25;
-    rsiSell         = 80;
-    buyPrice        = 0;
-    sellPrice       = 0;
-    percentSell     = -6;
-    dt              = DateTime();
-    dateBuy         = 0;
-    RSI14           = RSIa(Close, rsiInterval);
-    x               = Now(5);
-    dayNum          = DaysSince1900();;
 
     isValidStock = StrLen(Name()) == 3;
 
@@ -38,13 +38,13 @@ function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray
             if (tradeVolume == false) {
                 continue;
             }
-            rsi14Value = RSI14[i];
-            if (IsEmpty(rsi14Value)) {
+            rsi_today = rsi_close[i];
+
+            if (IsEmpty(rsi_today)) {
                 continue;
             }
 
-            rsi_Array[i]        = RSI14[i];
-                      buySignal = rsi14Value <= rsiBuy && isBuy == false;
+            buySignal = rsi_today <= rsi_buy_signal;
 
             if (buySignal) {
                 Print("**********  BUY **********");
@@ -77,21 +77,99 @@ function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray
 
             // }
 
-            sellSignalRSI   = rsi14Value >= rsiSell && isBuy == true;
-            sellAtPercentUp = isBuy == true && percent >= 200;
-            if (sellSignalRSI) {
+            // sellSignalRSI   = rsi_today >= rsiSell && isBuy == true;
+            // sellAtPercentUp = isBuy == true && percent >= 200;
+            // if (sellSignalRSI) {
 
-                percentArray [i]     = percent;
-                sellArray    [i]     = true;
-                              isBuy  = false;
-                              isSell = true;
-                sellDateArray[i]     = dayNum[i] - dateBuy;
+            //     percentArray [i]     = percent;
+            //     sellArray    [i]     = true;
+            //                   isBuy  = false;
+            //                   isSell = true;
+            //     sellDateArray[i]     = dayNum[i] - dateBuy;
+            // }
+            // else {
+            //     sellArray[i] = false;
+
+            //     percentArray [i] = 0;
+            //     sellDateArray[i] = 0;
+            // }
+
+        }
+
+    }
+    VarSet(outArrayBuy, buyArray);
+    VarSet(outArraySell, sellArray);
+
+    VarSet(outArrayPercentage, percentArray);
+    VarSet(outSellDateArray, sellDateArray);
+    VarSet(outRSIArray, rsi_close);
+    VarSet(out_current_percent, current_percent);
+
+}
+delay_day = 10;
+function BuyRSIPhanKiDuong(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray, outRSIArray, out_current_percent) {
+    is_search           = false;
+    isValidStock        = StrLen(Name()) == 3;
+    day_after_rsi_duong = 0;
+    if (isValidStock) {
+
+        dist     = 1.5 * ATR(10);
+        isBuy    = false;
+        is_sell  = true;
+        buyPrice = 1;
+        for (i = 0; i <= BarCount - 1; i++) {
+
+            currentDay                 = dt[i];
+            tradeVolume                = Volume[i] * Close[i] >= 500000;
+            sellPrice                  = Close[i];
+            percent                    = ((sellPrice - buyPrice) / buyPrice) * 100;
+            is_price_lower_than_lowest = L[i] <= rsi_price_lowest;
+
+            percentArray[i] = rsi_price_lowest;
+            if (is_price_lower_than_lowest) {
+                rsi_price_lowest = L[i];
+            }
+            if (tradeVolume == false) {
+                continue;
+            }
+            currentTime = DateTimeFormat("%Y-%m-%d", dt[i]);
+            rsi_today   = rsi_close[i];
+
+            if (IsEmpty(rsi_today)) {
+                continue;
+            }
+
+            if (is_search) {
+                previous_day_rsi           = rsi_close[i - 1];
+                is_rsi_lower_than_previous = rsi_today <= rsi_lowest;
+                day_after_rsi_duong        = day_after_rsi_duong + 1;
+
+                if (is_rsi_lower_than_previous) {
+                    rsi_lowest = rsi_today;
+
+                }
+
+                is_rsi_phan_ki_duong = rsi_today > rsi_lowest && is_price_lower_than_lowest && day_after_rsi_duong >= delay_day && rsi_today >= 35;
+                if (is_rsi_phan_ki_duong) {
+                    buyArray[i] = true;
+
+                                    day_after_rsi_duong = 0;
+                                    is_search           = false;
+                    current_percent[i]                  = ((Close[BarCount - 1] - Close[i]) / Close[i]) * 100;;
+                                    rsi_price_lowest    = 0;
+
+                }
+
             }
             else {
-                sellArray[i] = false;
+                is_buy_rsi = rsi_today <= rsi_buy_signal && is_search == false;
+                if (is_buy_rsi) {
+                              is_search        = true;
+                              rsi_lowest       = rsi_today;
+                              rsi_price_lowest = L[i];
+                    sellArray[i]               = true;
 
-                percentArray [i] = 0;
-                sellDateArray[i] = 0;
+                }
             }
 
         }
@@ -102,7 +180,7 @@ function BuySell(outArrayBuy, outArraySell, outArrayPercentage, outSellDateArray
 
     VarSet(outArrayPercentage, percentArray);
     VarSet(outSellDateArray, sellDateArray);
-    VarSet(outRSIArray, rsi_Array);
+    VarSet(outRSIArray, rsi_close);
     VarSet(out_current_percent, current_percent);
 
 }
