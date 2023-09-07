@@ -10,8 +10,8 @@ current_percent_buy = Null;
 result              = BuyRSIPhanKiDuong("buyArray", "sellArray", "percentArray", "sellDateArray", "RSI_Array", "current_percent_buy");
 
 Buy    = buyArray;
-Sell   = sellArray;
-Filter = buyArray || sellArray;
+//Sell   = sellArray;
+Filter = buyArray;
 AddTextColumn(FullName(), "Name");
 AddColumn(Close, "Close");
 AddColumn(Volume, "Volume");
@@ -26,3 +26,4 @@ AddColumn(current_percent_buy, "Percent Today", 1.2, colorWhite, percent_buy_col
 High_Price = hhv(High, BarCount - 1);
 
 AddTextColumn(NumToStr(High_Price[BarCount - 1]), "High"); 
+
